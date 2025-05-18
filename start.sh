@@ -120,6 +120,7 @@ cleanup_logs() {
 
 # 启动服务器
 echo "启动smartrpa服务器..."
+nohup node /app/serverless.js > /home/kasm-user/logs/serverless.log 2>&1 &
 while true; do
     # 清理旧日志文件
     cleanup_logs
