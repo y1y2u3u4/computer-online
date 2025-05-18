@@ -1,0 +1,4 @@
+# 忽略 AdsPower.deb 文件
+AdsPower.deb
+chrome_131.tar.gz
+*.deb

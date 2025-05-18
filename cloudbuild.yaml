@@ -1,0 +1,43 @@
+# 设置缓存存储位置
+options:
+  machineType: 'N1_HIGHCPU_8'
+  diskSizeGb: '100'
+  dynamic_substitutions: true
+
+steps:
+# 构建 Docker 镜像
+- name: 'gcr.io/cloud-builders/docker'
+  args: [
+    'build',
+    '--platform', 'linux/amd64',
+    '--no-cache',
+    '-t', 'xiaoshitou001/runpod-handler:v2.0',
+    '-t', 'xiaoshitou001/runpod-handler:cache',
+    '.',
+  ]
+  id: 'build'
+
+# 推送到 Docker Hub
+- name: 'gcr.io/cloud-builders/docker'
+  secretEnv: ['DOCKERHUB_USERNAME', 'DOCKERHUB_PASSWORD']
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    echo "$$DOCKERHUB_PASSWORD" | docker login --username "$$DOCKERHUB_USERNAME" --password-stdin
+    docker push xiaoshitou001/runpod-handler:v2.0
+    docker push xiaoshitou001/runpod-handler:cache
+  id: 'push'
+
+# 设置超时时间
+timeout: '3600s'
+
+# 需要的密钥变量
+secrets:
+- kmsKeyName: projects/civil-zodiac-422613-b7/locations/global/keyRings/my-keyring/cryptoKeys/my-key
+  secretEnv:
+    DOCKERHUB_USERNAME: 'CiQAobh3kTWhi/aA24dFfiVM8DKKnzc+hI9vWl9dpeCh+TWHZEcSNgCI1Zj5Ko7KUc9CgtDS0qq8kNQCj2PVJGWupa2hBbFZcj7RmbJLQ8J17oboC1DcvIKB+0MXxA=='
+    DOCKERHUB_PASSWORD: 'CiQAobh3kZRJiewoFVgVeELkAPBAf2JHLG80Y92XPq+jwkVdXt4SMwCI1Zj5qQmAp+7uBMJiNVVctRM1DJcNGJ5K0oZsCbgLt5CytntWQcIIoaagQTpR9sZp8g=='
+
+
+
